@@ -1,6 +1,7 @@
 package Week4;
 
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Queue;
 
 /**
  * Created by Zoro on 17-7-10.
@@ -11,7 +12,11 @@ public class Board {
     public Board(int[][] blocks) {
         this.boardDimension = blocks.length;
         this.blocks = new int[boardDimension][boardDimension];
-        System.arraycopy(blocks,0,this.blocks,0, boardDimension);
+        for (int i = 0; i < boardDimension; i++) {
+            for (int j = 0; j < boardDimension; j++) {
+                this.blocks[i][j] = blocks[i][j];
+            }
+        }
     }
 
     public int dimension() {
@@ -79,7 +84,11 @@ public class Board {
 
     public int[][] exchange(int[][] matrix, int iFirst,int jFirst,int iSecond,int jSecond) {
         int[][] newMatrix = new int[boardDimension][boardDimension];
-        System.arraycopy(matrix,0,newMatrix,0, boardDimension);
+        for (int i = 0; i < boardDimension; i++) {
+            for (int j = 0; j < boardDimension; j++) {
+                newMatrix[i][j] = matrix[i][j];
+            }
+        }
         int t;
         t = newMatrix[iFirst][jFirst];
         newMatrix[iFirst][jFirst] = newMatrix[iSecond][jSecond];
@@ -88,7 +97,55 @@ public class Board {
     }
 
     public Iterable<Board> neighbors() {
-        MinPQ<Board> minPQ = new MinPQ<>();
+//        MinPQ<Board> minPQ = new MinPQ<>();
+//        int iIndex = -1;
+//        int jIndex = -1;
+//        for (int i = 0; i < boardDimension; i++) {
+//            for (int j = 0; j < boardDimension; j++) {
+//                if (blocks[i][j] == 0) {
+//                    iIndex = i;
+//                    jIndex = j;
+//                }
+//            }
+//        }
+//        if (iIndex == 0 && jIndex == 0) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//
+//        } else if (iIndex == 0 && jIndex == boardDimension - 1) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//
+//        } else if (iIndex == boardDimension - 1 && jIndex == 0) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//        } else if (iIndex == boardDimension - 1 && jIndex == boardDimension - 1) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//        } else if (iIndex == 0) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//        } else if (iIndex == boardDimension - 1) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//        } else if (jIndex == 0) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//        } else if (jIndex == boardDimension - 1) {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//        } else {
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+//            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+//        }
+//        return minPQ;
+        Queue<Board> boardQueue = new Queue<>();
         int iIndex = -1;
         int jIndex = -1;
         for (int i = 0; i < boardDimension; i++) {
@@ -100,42 +157,42 @@ public class Board {
             }
         }
         if (iIndex == 0 && jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
 
         } else if (iIndex == 0 && jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
 
         } else if (iIndex == boardDimension - 1 && jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (iIndex == boardDimension - 1 && jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (iIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
         } else if (iIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
         } else if (jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
         } else {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            boardQueue.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
         }
-        return minPQ;
+        return boardQueue;
     }
 
 
@@ -149,7 +206,6 @@ public class Board {
             }
             s = s + "\n";
         }
-
         return s;
     }
 
@@ -194,8 +250,10 @@ public class Board {
         blocks4[2][1] = 8;
         blocks4[2][2] = 0;
         Board board4 = new Board(blocks4);
-        System.out.println(board1.equals(board1));
-        System.out.println(board1.equals(blocks1));
-        System.out.println(board1.equals(board2));
+
+        System.out.println(board3);
+        for (Board b : board3.neighbors()) {
+            System.out.println(b);
+        }
     }
 }
