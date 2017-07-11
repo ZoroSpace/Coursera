@@ -1,5 +1,7 @@
 package Week4;
 
+import edu.princeton.cs.algs4.MinPQ;
+
 /**
  * Created by Zoro on 17-7-10.
  */
@@ -63,6 +65,81 @@ public class Board {
         return new Board(newBlock);
     }
 
+    public boolean equals(Object y) {
+        if (!(y instanceof Board)) return false;
+        Board that = (Board)y;
+        if (this.boardDimension != that.boardDimension) return false;
+        for (int i = 0; i < boardDimension; i++) {
+            for (int j = 0; j < boardDimension; j++) {
+                if (this.blocks[i][j] != that.blocks[i][j]) return false;
+            }
+        }
+        return true;
+    }
+
+    public int[][] exchange(int[][] matrix, int iFirst,int jFirst,int iSecond,int jSecond) {
+        int[][] newMatrix = new int[boardDimension][boardDimension];
+        System.arraycopy(matrix,0,newMatrix,0, boardDimension);
+        int t;
+        t = newMatrix[iFirst][jFirst];
+        newMatrix[iFirst][jFirst] = newMatrix[iSecond][jSecond];
+        newMatrix[iSecond][jSecond] = t;
+        return newMatrix;
+    }
+
+    public Iterable<Board> neighbors() {
+        MinPQ<Board> minPQ = new MinPQ<>();
+        int iIndex = -1;
+        int jIndex = -1;
+        for (int i = 0; i < boardDimension; i++) {
+            for (int j = 0; j < boardDimension; j++) {
+                if (blocks[i][j] == 0) {
+                    iIndex = i;
+                    jIndex = j;
+                }
+            }
+        }
+        if (iIndex == 0 && jIndex == 0) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+
+        } else if (iIndex == 0 && jIndex == boardDimension - 1) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+
+        } else if (iIndex == boardDimension - 1 && jIndex == 0) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+        } else if (iIndex == boardDimension - 1 && jIndex == boardDimension - 1) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+        } else if (iIndex == 0) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+        } else if (iIndex == boardDimension - 1) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+        } else if (jIndex == 0) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+        } else if (jIndex == boardDimension - 1) {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+        } else {
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+        }
+        return minPQ;
+    }
+
+
+
     @Override
     public String toString() {
         String s = "";
@@ -76,42 +153,49 @@ public class Board {
         return s;
     }
 
+
+
     public static void main(String[] args) {
 
-//        int[][] blocks = new int[2][2];
-//        blocks[0][0] = 2;
-//        blocks[0][1] = 1;
-//        blocks[1][0] = 3;
-//        blocks[1][1] = 0;
+        int[][] blocks1 = new int[2][2];
+        blocks1[0][0] = 2;
+        blocks1[0][1] = 1;
+        blocks1[1][0] = 3;
+        blocks1[1][1] = 0;
+        Board board1 = new Board(blocks1);
 
-//        int[][] blocks = new int[2][2];
-//        blocks[0][0] = 1;
-//        blocks[0][1] = 2;
-//        blocks[1][0] = 3;
-//        blocks[1][1] = 0;
+        int[][] blocks2 = new int[2][2];
+        blocks2[0][0] = 1;
+        blocks2[0][1] = 2;
+        blocks2[1][0] = 3;
+        blocks2[1][1] = 0;
+        Board board2 = new Board(blocks2);
 
-//        int[][] blocks = new int[3][3];
-//        blocks[0][0] = 8;
-//        blocks[0][1] = 1;
-//        blocks[0][2] = 3;
-//        blocks[1][0] = 4;
-//        blocks[1][1] = 0;
-//        blocks[1][2] = 2;
-//        blocks[2][0] = 7;
-//        blocks[2][1] = 6;
-//        blocks[2][2] = 5;
+        int[][] blocks3 = new int[3][3];
+        blocks3[0][0] = 8;
+        blocks3[0][1] = 1;
+        blocks3[0][2] = 3;
+        blocks3[1][0] = 4;
+        blocks3[1][1] = 0;
+        blocks3[1][2] = 2;
+        blocks3[2][0] = 7;
+        blocks3[2][1] = 6;
+        blocks3[2][2] = 5;
+        Board board3 = new Board(blocks3);
 
-        int[][] blocks = new int[3][3];
-        blocks[0][0] = 1;
-        blocks[0][1] = 2;
-        blocks[0][2] = 3;
-        blocks[1][0] = 4;
-        blocks[1][1] = 5;
-        blocks[1][2] = 6;
-        blocks[2][0] = 7;
-        blocks[2][1] = 8;
-        blocks[2][2] = 0;
-        Board board = new Board(blocks);
-        System.out.println(board);
+        int[][] blocks4 = new int[3][3];
+        blocks4[0][0] = 1;
+        blocks4[0][1] = 2;
+        blocks4[0][2] = 3;
+        blocks4[1][0] = 4;
+        blocks4[1][1] = 5;
+        blocks4[1][2] = 6;
+        blocks4[2][0] = 7;
+        blocks4[2][1] = 8;
+        blocks4[2][2] = 0;
+        Board board4 = new Board(blocks4);
+        System.out.println(board1.equals(board1));
+        System.out.println(board1.equals(blocks1));
+        System.out.println(board1.equals(board2));
     }
 }
