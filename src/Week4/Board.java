@@ -9,6 +9,8 @@ import edu.princeton.cs.algs4.Queue;
 public class Board {
     private int boardDimension;
     private int[][] blocks;
+    private int hammingValue = -1;
+    private int manhattanValue = -1;
     public Board(int[][] blocks) {
         this.boardDimension = blocks.length;
         this.blocks = new int[boardDimension][boardDimension];
@@ -24,31 +26,38 @@ public class Board {
     }
 
     public int hamming() {
-        int hammingCounter = 0;
-        for (int i = 0; i < boardDimension; i++) {
-            for (int j = 0; j < boardDimension; j++) {
-                if (blocks[i][j] != 0 && blocks[i][j] != i * boardDimension + j + 1) {
-                    hammingCounter++;
-                }
-            }
-        }
-        return hammingCounter;
-    }
-
-    public int manhattan() {
-        int manhattanCounter = 0;
-        for (int i = 0; i < boardDimension; i++) {
-            for (int j = 0; j < boardDimension; j++) {
-                if (blocks[i][j] != 0) {
-                    if (blocks[i][j] % boardDimension == 0) {
-                        manhattanCounter += Math.abs(blocks[i][j]/boardDimension - i - 1) + Math.abs(boardDimension - 1 - j);
-                    } else {
-                        manhattanCounter += Math.abs(blocks[i][j]/boardDimension - i) + Math.abs(blocks[i][j]%boardDimension - 1 - j);
+        if (hammingValue == -1) {
+            int hammingCounter = 0;
+            for (int i = 0; i < boardDimension; i++) {
+                for (int j = 0; j < boardDimension; j++) {
+                    if (blocks[i][j] != 0 && blocks[i][j] != i * boardDimension + j + 1) {
+                        hammingCounter++;
                     }
                 }
             }
+            hammingValue = hammingCounter;
         }
-        return manhattanCounter;
+        return hammingValue;
+
+    }
+
+    public int manhattan() {
+        if (manhattanValue == -1) {
+            int manhattanCounter = 0;
+            for (int i = 0; i < boardDimension; i++) {
+                for (int j = 0; j < boardDimension; j++) {
+                    if (blocks[i][j] != 0) {
+                        if (blocks[i][j] % boardDimension == 0) {
+                            manhattanCounter += Math.abs(blocks[i][j]/boardDimension - i - 1) + Math.abs(boardDimension - 1 - j);
+                        } else {
+                            manhattanCounter += Math.abs(blocks[i][j]/boardDimension - i) + Math.abs(blocks[i][j]%boardDimension - 1 - j);
+                        }
+                    }
+                }
+            }
+            manhattanValue = manhattanCounter;
+        }
+        return manhattanValue;
     }
 
     public boolean isGoal() {
