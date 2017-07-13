@@ -4,6 +4,7 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -11,45 +12,59 @@ import java.util.LinkedList;
  */
 public class Solver {
     private LinkedList<Board> closedList;
-    private LinkedList<Board> twinClosedList;
-    private Board initialBorad;
-    int isSolvable = 0;
-    public Solver(Board initial) {
-        if (initial == null) {
+    HashSet<Board> caculatedBoard = new HashSet<>();//用于缓存计算过的Board TODO
+    private boolean solvableFlag;
+    public Solver(Board initialBoard) {
+
+        if (initialBoard == null) {
             throw new IllegalArgumentException("The constructor received a null argument.");
         }
-        this.initialBorad = initial;
+        LinkedList<Board> twinClosedList;
+        Board twinInitialBoard = initialBoard.twin();
         closedList = new LinkedList<>();//closed list
-        Board currentNode = initial;
-        MinPQ<Board> currentNeighbors = (MinPQ)currentNode.neighbors();//open list
-        while (!currentNode.isGoal()) {
-            if ((new Solver(currentNode)).isSolvable() && (!closedList.contains(currentNode))) {
-                closedList.add(currentNode);
-                currentNeighbors = (MinPQ)currentNode.neighbors();
+        twinClosedList = new LinkedList<>();
+        Board currentBoard = initialBoard;
+        Board twinCurrentBoard = twinInitialBoard;
+        MinPQ<Board> currentNeighbors = (MinPQ)currentBoard.neighbors();//open list
+        MinPQ<Board> twinCurrentNeighbors = (MinPQ)twinCurrentBoard.neighbors();
+        while (true) {
+            if ((!closedList.contains(currentBoard))) {
+                closedList.add(currentBoard);
+                currentNeighbors = (MinPQ)currentBoard.neighbors();
             }
-            currentNode = currentNeighbors.delMin();
+            currentBoard = currentNeighbors.delMin();
+
+            if ((!twinClosedList.contains(twinCurrentBoard))) {
+                twinClosedList.add(twinCurrentBoard);
+                twinCurrentNeighbors = (MinPQ)twinCurrentBoard.neighbors();
+            }
+            twinCurrentBoard = twinCurrentNeighbors.delMin();
+            if (currentBoard.isGoal()) {
+                solvableFlag = true;
+                break;
+            }
+            if (twinCurrentBoard.isGoal()) {
+                solvableFlag = false;
+                break;
+            }
         }
     }
 
     public boolean isSolvable() {
-        if (isSolvable == 1) {
-            return true;
-        } else if (isSolvable == -1) {
-            return false;
-        }
-        return false;
+        return solvableFlag;
     }
 
     public Iterable<Board> solution() {
         if (!isSolvable()) {
             return null;
-        } else return null;//TODO
+        } else {
+            return closedList;
+        }
     }
 
     public int moves() {
-        if (!isSolvable()) {
-            return -1;
-        } else return 1;//TODO
+        if (!isSolvable()) return -1;
+        else return closedList.size();
     }
 
     public static void main(String[] args) {
