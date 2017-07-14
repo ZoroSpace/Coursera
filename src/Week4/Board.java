@@ -65,6 +65,11 @@ public class Board implements Comparable{
 
     public Board twin() {
         int[][] newBlock = new int[boardDimension][boardDimension];
+        for (int i = 0; i < boardDimension; i++) {
+            for (int j = 0; j < boardDimension; j++) {
+                newBlock[i][j] = blocks[i][j];
+            }
+        }
         if (newBlock[0][0] != 0 && newBlock[0][1] != 0) {
             int i = newBlock[0][0];
             newBlock[0][0] = newBlock[0][1];
@@ -74,7 +79,6 @@ public class Board implements Comparable{
             newBlock[1][0] = newBlock[1][1];
             newBlock[1][1] = i;
         }
-
         return new Board(newBlock);
     }
 
@@ -212,16 +216,17 @@ public class Board implements Comparable{
         Board board4 = new Board(blocks4);
 
         System.out.println(board3);
-        for (Board b : board3.neighbors()) {
-            System.out.println(b);
-        }
+        System.out.println(board3.twin());
+//        for (Board b : board3.neighbors()) {
+//            System.out.println(b);
+//        }
     }
 
     @Override
     public int compareTo(Object o) {
         Board that = (Board)o;
-        if (this.hamming() < that.hamming()) return -1;
-        if (this.hamming() == that.hamming()) return 0;
+        if (this.manhattan() < that.manhattan()) return -1;
+        if (this.manhattan() == that.manhattan()) return 0;
         else return 1;
     }
 }
