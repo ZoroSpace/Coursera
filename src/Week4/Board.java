@@ -1,15 +1,16 @@
 package Week4;
 
-import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Queue;
 
 /**
  * Created by Zoro on 17-7-10.
  */
-public class Board implements Comparable{
+public class Board {
     private int boardDimension;
     private int[][] blocks;
     private int hammingValue = -1;
     private int manhattanValue = -1;
+    public int step = 0;
     public Board(int[][] blocks) {
         this.boardDimension = blocks.length;
         this.blocks = new int[boardDimension][boardDimension];
@@ -94,7 +95,7 @@ public class Board implements Comparable{
         return true;
     }
 
-    public int[][] exchange(int[][] matrix, int iFirst,int jFirst,int iSecond,int jSecond) {
+    private int[][] exchange(int[][] matrix, int iFirst,int jFirst,int iSecond,int jSecond) {
         int[][] newMatrix = new int[boardDimension][boardDimension];
         for (int i = 0; i < boardDimension; i++) {
             for (int j = 0; j < boardDimension; j++) {
@@ -109,7 +110,7 @@ public class Board implements Comparable{
     }
 
     public Iterable<Board> neighbors() {
-        MinPQ<Board> minPQ = new MinPQ<>();
+        Queue<Board> neighborBoards = new Queue<>();
         int iIndex = -1;
         int jIndex = -1;
         for (int i = 0; i < boardDimension; i++) {
@@ -121,42 +122,42 @@ public class Board implements Comparable{
             }
         }
         if (iIndex == 0 && jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
 
         } else if (iIndex == 0 && jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
 
         } else if (iIndex == boardDimension - 1 && jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (iIndex == boardDimension - 1 && jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (iIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
         } else if (iIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
         } else if (jIndex == 0) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
         } else if (jIndex == boardDimension - 1) {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
         } else {
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
-            minPQ.insert(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex - 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex + 1,jIndex)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex - 1)));
+            neighborBoards.enqueue(new Board(exchange(this.blocks,iIndex,jIndex,iIndex,jIndex + 1)));
         }
-        return minPQ;
+        return neighborBoards;
     }
 
 
@@ -217,16 +218,8 @@ public class Board implements Comparable{
 
         System.out.println(board3);
         System.out.println(board3.twin());
-//        for (Board b : board3.neighbors()) {
-//            System.out.println(b);
-//        }
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        Board that = (Board)o;
-        if (this.manhattan() < that.manhattan()) return -1;
-        if (this.manhattan() == that.manhattan()) return 0;
-        else return 1;
+        for (Board b : board3.neighbors()) {
+            System.out.println(b);
+        }
     }
 }

@@ -1,54 +1,80 @@
 package Week4;
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
-import java.util.LinkedList;
+
 /**
  * Created by Zoro on 17-7-12.
  */
+
 public class Solver {
-    private LinkedList<Board> closedList;
-    private boolean solvableFlag;
+
+    private class SearchNode implements Comparable<SearchNode> {
+        Board currentBoard;
+        int steps;
+        SearchNode previousNode;
+
+        public SearchNode(Board currentBoard, int steps, SearchNode previousNode) {
+            this.currentBoard = currentBoard;
+            this.steps = steps;
+            this.previousNode = previousNode;
+        }
+
+        @Override
+        public int compareTo(SearchNode that) {
+            if (this.steps + this.currentBoard.manhattan() <
+                    that.steps + that.currentBoard.manhattan()) return -1;
+            if (this.steps + this.currentBoard.manhattan() >
+                    that.steps + that.currentBoard.manhattan()) return 1;
+            return 0;
+        }
+    }
+    private boolean solvableFlag = true;
+    private Stack solution = new Stack();
+
     public Solver(Board initialBoard) {
-        if (initialBoard == null) throw new IllegalArgumentException("The constructor received a null argument.");
-
-        LinkedList<Board> twinClosedList;
-        Board twinInitialBoard = initialBoard.twin();
-        closedList = new LinkedList<>();
-        twinClosedList = new LinkedList<>();
-        Board currentBoard = initialBoard;
-        Board twinCurrentBoard = twinInitialBoard;
-        MinPQ<Board> currentNeighbors = (MinPQ)currentBoard.neighbors();//open list
-        MinPQ<Board> twinCurrentNeighbors = (MinPQ)twinCurrentBoard.neighbors();
-
-        while (true) {
-
-            if ((!closedList.contains(currentBoard))) {
-                closedList.add(currentBoard);
-                currentNeighbors = (MinPQ)currentBoard.neighbors();
+        if (initialBoard == null)
+            throw new IllegalArgumentException("The constructor received a null argument.");
+        MinPQ<SearchNode> openList = new MinPQ<>();
+        SearchNode initialSearchNode = new SearchNode(initialBoard,0,null);
+        openList.insert(initialSearchNode);
+        SearchNode end = null;//CLOSED
+        while (!openList.min().currentBoard.isGoal()) {
+            SearchNode currentNode = openList.delMin();
+            //add current to CLOSED
+            end = currentNode;
+            label:
+            for (Board board : currentNode.currentBoard.neighbors()) {
+                board.step = currentNode.steps + 1;
+                //if neighbor in OPEN and cost less than g(neighbor):
+                for (SearchNode node : openList) {
+                    if (board.equals(node.currentBoard)) {
+                        if (board.step < node.steps) {
+                            node.steps = board.step;
+                            node.previousNode = currentNode;
+                        }
+                        continue label;
+                    }
+                }
+                //if neighbor in CLOSED and cost less than g(neighbor):
+                for (SearchNode node = end;node != null;node = node.previousNode) {
+                    if (board.equals(node.currentBoard)) {
+                        if (board.step < node.steps) {
+                            node.steps = board.step;
+                            node.previousNode = currentNode;
+                        }
+                        continue label;
+                    }
+                }
+                //if neighbor not in OPEN and neighbor not in CLOSED:
+                openList.insert(new SearchNode(board,board.step,currentNode));
             }
-            if (!currentNeighbors.isEmpty()) {
-                currentBoard = currentNeighbors.delMin();
-            }
-            if (currentBoard.isGoal()) {
-                closedList.add(currentBoard);
-                solvableFlag = true;
-                break;
-            }
-
-
-            if ((!twinClosedList.contains(twinCurrentBoard))) {
-                twinClosedList.add(twinCurrentBoard);
-                twinCurrentNeighbors = (MinPQ)twinCurrentBoard.neighbors();
-            }
-            if (!twinCurrentNeighbors.isEmpty()) {
-                twinCurrentBoard = twinCurrentNeighbors.delMin();
-            }
-            if (twinCurrentBoard.isGoal()) {
-                twinClosedList.add(twinCurrentBoard);
-                solvableFlag = false;
-                break;
-            }
+        }
+        end = openList.min();
+        for (SearchNode node = end;node != null;node = node.previousNode) {
+            solution.push(node.currentBoard);
         }
     }
 
@@ -60,45 +86,27 @@ public class Solver {
         if (!isSolvable()) {
             return null;
         } else {
-            return closedList;
+            return solution;
         }
     }
 
     public int moves() {
         if (!isSolvable()) return -1;
-        else return closedList.size() - 1;
+        else return solution.size() - 1;
     }
 
     public static void main(String[] args) {
-
         // create initial board from file
-//        In in = new In(args[0]);
-//        int n = in.readInt();
-//        int[][] blocks = new int[n][n];
-//        for (int i = 0; i < n; i++)
-//            for (int j = 0; j < n; j++)
-//                blocks[i][j] = in.readInt();
-//        Board initial = new Board(blocks);
+        In in = new In(args[0]);
+        int n = in.readInt();
+        int[][] blocks = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                blocks[i][j] = in.readInt();
+        Board initial = new Board(blocks);
 
-        int[][] blocks1 = new int[2][2];
-        blocks1[0][0] = 1;
-        blocks1[0][1] = 2;
-        blocks1[1][0] = 0;
-        blocks1[1][1] = 3;
-        Board board1 = new Board(blocks1);
-        int[][] blocks3 = new int[3][3];
-        blocks3[0][0] = 5;
-        blocks3[0][1] = 6;
-        blocks3[0][2] = 2;
-        blocks3[1][0] = 1;
-        blocks3[1][1] = 8;
-        blocks3[1][2] = 4;
-        blocks3[2][0] = 7;
-        blocks3[2][1] = 3;
-        blocks3[2][2] = 0;
-        Board board3 = new Board(blocks3);
         // solve the puzzle
-        Solver solver = new Solver(board3);
+        Solver solver = new Solver(initial);
 
         // print solution to standard output
         if (!solver.isSolvable())
@@ -108,8 +116,5 @@ public class Solver {
             for (Board board : solver.solution())
                 StdOut.println(board);
         }
-
-
     }
-
 }
