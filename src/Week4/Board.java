@@ -10,7 +10,8 @@ public class Board {
     private int[][] blocks;
     private int hammingValue = -1;
     private int manhattanValue = -1;
-    public int step = 0;
+    int step = 0;
+
     public Board(int[][] blocks) {
         this.boardDimension = blocks.length;
         this.blocks = new int[boardDimension][boardDimension];

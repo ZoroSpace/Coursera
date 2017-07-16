@@ -31,7 +31,7 @@ public class Solver {
             return 0;
         }
     }
-    private boolean solvableFlag = true;
+    private boolean solvableFlag = false;
     private Stack solution = new Stack();
 
     public Solver(Board initialBoard) {
@@ -40,8 +40,13 @@ public class Solver {
         MinPQ<SearchNode> openList = new MinPQ<>();
         SearchNode initialSearchNode = new SearchNode(initialBoard,0,null);
         openList.insert(initialSearchNode);
-        SearchNode end = null;//CLOSED
-        while (!openList.min().currentBoard.isGoal()) {
+        SearchNode end;//CLOSED
+
+        MinPQ<SearchNode> twinOpenList = new MinPQ<>();
+        SearchNode twinInitialSearchNode = new SearchNode(initialBoard.twin(),0,null);
+        twinOpenList.insert(twinInitialSearchNode);
+        SearchNode twinEnd;
+        while (!openList.min().currentBoard.isGoal() && !twinOpenList.min().currentBoard.isGoal()) {
             SearchNode currentNode = openList.delMin();
             //add current to CLOSED
             end = currentNode;
@@ -71,11 +76,48 @@ public class Solver {
                 //if neighbor not in OPEN and neighbor not in CLOSED:
                 openList.insert(new SearchNode(board,board.step,currentNode));
             }
+
+            SearchNode twinCurrentNode = twinOpenList.delMin();
+            //add current to CLOSED
+            twinEnd = twinCurrentNode;
+            label2:
+            for (Board board : twinCurrentNode.currentBoard.neighbors()) {
+                board.step = twinCurrentNode.steps + 1;
+                //if neighbor in OPEN and cost less than g(neighbor):
+                for (SearchNode node : twinOpenList) {
+                    if (board.equals(node.currentBoard)) {
+                        if (board.step < node.steps) {
+                            node.steps = board.step;
+                            node.previousNode = twinCurrentNode;
+                        }
+                        continue label2;
+                    }
+                }
+                //if neighbor in CLOSED and cost less than g(neighbor):
+                for (SearchNode node = twinEnd;node != null;node = node.previousNode) {
+                    if (board.equals(node.currentBoard)) {
+                        if (board.step < node.steps) {
+                            node.steps = board.step;
+                            node.previousNode = twinCurrentNode;
+                        }
+                        continue label2;
+                    }
+                }
+                //if neighbor not in OPEN and neighbor not in CLOSED:
+                twinOpenList.insert(new SearchNode(board,board.step,twinCurrentNode));
+            }
         }
-        end = openList.min();
-        for (SearchNode node = end;node != null;node = node.previousNode) {
-            solution.push(node.currentBoard);
+
+        if (openList.min().currentBoard.isGoal()) {
+            solvableFlag = true;
+            end = openList.min();
+            for (SearchNode node = end;node != null;node = node.previousNode) {
+                solution.push(node.currentBoard);
+            }
+        } else if (twinOpenList.min().currentBoard.isGoal()) {
+            solvableFlag = false;
         }
+
     }
 
     public boolean isSolvable() {
