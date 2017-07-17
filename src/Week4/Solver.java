@@ -32,7 +32,7 @@ public class Solver {
         }
     }
     private boolean solvableFlag = false;
-    private Stack solution = new Stack();
+    private Stack<Board> solution = new Stack<>();
 
     public Solver(Board initialBoard) {
         if (initialBoard == null)
@@ -41,7 +41,6 @@ public class Solver {
         SearchNode initialSearchNode = new SearchNode(initialBoard,0,null);
         openList.insert(initialSearchNode);
         SearchNode end;//CLOSED
-
         MinPQ<SearchNode> twinOpenList = new MinPQ<>();
         SearchNode twinInitialSearchNode = new SearchNode(initialBoard.twin(),0,null);
         twinOpenList.insert(twinInitialSearchNode);
@@ -49,62 +48,75 @@ public class Solver {
         while (!openList.min().currentBoard.isGoal() && !twinOpenList.min().currentBoard.isGoal()) {
             SearchNode currentNode = openList.delMin();
             //add current to CLOSED
-            end = currentNode;
-            label:
+//            end = currentNode;
+//            label:
             for (Board board : currentNode.currentBoard.neighbors()) {
-                board.step = currentNode.steps + 1;
-                //if neighbor in OPEN and cost less than g(neighbor):
-                for (SearchNode node : openList) {
-                    if (board.equals(node.currentBoard)) {
-                        if (board.step < node.steps) {
-                            node.steps = board.step;
-                            node.previousNode = currentNode;
-                        }
-                        continue label;
-                    }
+                if (currentNode.previousNode != null) {
+                    if (!board.equals(currentNode.previousNode.currentBoard))
+                        openList.insert(new SearchNode(board,currentNode.steps + 1,currentNode));
+                } else {
+                    openList.insert(new SearchNode(board,currentNode.steps + 1,currentNode));
                 }
-                //if neighbor in CLOSED and cost less than g(neighbor):
-                for (SearchNode node = end;node != null;node = node.previousNode) {
-                    if (board.equals(node.currentBoard)) {
-                        if (board.step < node.steps) {
-                            node.steps = board.step;
-                            node.previousNode = currentNode;
-                        }
-                        continue label;
-                    }
-                }
-                //if neighbor not in OPEN and neighbor not in CLOSED:
-                openList.insert(new SearchNode(board,board.step,currentNode));
+
+//                //if neighbor in OPEN and cost less than g(neighbor):
+//                for (SearchNode node : openList) {
+//                    if (board.equals(node.currentBoard)) {
+//                        if (currentNode.steps + 1 < node.steps) {
+//                            node.steps = currentNode.steps + 1;
+//                            node.previousNode = currentNode;
+//                        }
+//                        continue label;
+//                    }
+//                }
+//                //if neighbor in CLOSED and cost less than g(neighbor):
+//                for (SearchNode node = end;node != null;node = node.previousNode) {
+//                    if (board.equals(node.currentBoard)) {
+//                        if (currentNode.steps + 1 < node.steps) {
+//                            node.steps = currentNode.steps + 1;
+//                            node.previousNode = currentNode;
+//                        }
+//                        continue label;
+//                    }
+//                }
+//                //if neighbor not in OPEN and neighbor not in CLOSED:
+//                openList.insert(new SearchNode(board,currentNode.steps + 1,currentNode));
             }
 
             SearchNode twinCurrentNode = twinOpenList.delMin();
             //add current to CLOSED
-            twinEnd = twinCurrentNode;
-            label2:
+//            twinEnd = twinCurrentNode;
+//            label2:
             for (Board board : twinCurrentNode.currentBoard.neighbors()) {
-                board.step = twinCurrentNode.steps + 1;
-                //if neighbor in OPEN and cost less than g(neighbor):
-                for (SearchNode node : twinOpenList) {
-                    if (board.equals(node.currentBoard)) {
-                        if (board.step < node.steps) {
-                            node.steps = board.step;
-                            node.previousNode = twinCurrentNode;
-                        }
-                        continue label2;
+                if (twinCurrentNode.previousNode != null) {
+                    if ( !board.equals(twinCurrentNode.previousNode.currentBoard)) {
+                        twinOpenList.insert(new SearchNode(board,twinCurrentNode.steps + 1,twinCurrentNode));
                     }
+                } else {
+                    twinOpenList.insert(new SearchNode(board,twinCurrentNode.steps + 1,twinCurrentNode));
                 }
-                //if neighbor in CLOSED and cost less than g(neighbor):
-                for (SearchNode node = twinEnd;node != null;node = node.previousNode) {
-                    if (board.equals(node.currentBoard)) {
-                        if (board.step < node.steps) {
-                            node.steps = board.step;
-                            node.previousNode = twinCurrentNode;
-                        }
-                        continue label2;
-                    }
-                }
-                //if neighbor not in OPEN and neighbor not in CLOSED:
-                twinOpenList.insert(new SearchNode(board,board.step,twinCurrentNode));
+
+//                //if neighbor in OPEN and cost less than g(neighbor):
+//                for (SearchNode node : twinOpenList) {
+//                    if (board.equals(node.currentBoard)) {
+//                        if (twinCurrentNode.steps + 1 < node.steps) {
+//                            node.steps = twinCurrentNode.steps + 1;
+//                            node.previousNode = twinCurrentNode;
+//                        }
+//                        continue label2;
+//                    }
+//                }
+//                //if neighbor in CLOSED and cost less than g(neighbor):
+//                for (SearchNode node = twinEnd;node != null;node = node.previousNode) {
+//                    if (board.equals(node.currentBoard)) {
+//                        if (twinCurrentNode.steps + 1 < node.steps) {
+//                            node.steps = twinCurrentNode.steps + 1;
+//                            node.previousNode = twinCurrentNode;
+//                        }
+//                        continue label2;
+//                    }
+//                }
+//                //if neighbor not in OPEN and neighbor not in CLOSED:
+//                twinOpenList.insert(new SearchNode(board,twinCurrentNode.steps + 1,twinCurrentNode));
             }
         }
 

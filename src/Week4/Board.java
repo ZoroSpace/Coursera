@@ -10,7 +10,6 @@ public class Board {
     private int[][] blocks;
     private int hammingValue = -1;
     private int manhattanValue = -1;
-    int step = 0;
 
     public Board(int[][] blocks) {
         this.boardDimension = blocks.length;
@@ -165,10 +164,11 @@ public class Board {
 
     @Override
     public String toString() {
-        String s = "";
+        String s = " ";
+        s = s + dimension() + "\n";
         for (int i = 0; i < boardDimension; i++) {
             for (int j = 0; j < boardDimension; j++) {
-                s = s + String.format("%4d",blocks[i][j]);
+                s = s + String.format("%3d",blocks[i][j]);
             }
             s = s + "\n";
         }
